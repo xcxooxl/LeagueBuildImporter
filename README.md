@@ -6,5 +6,7 @@ Imports builds(runes + items) from mobafire to league of legends automatically w
 Also supports searching by role if in draft pick/ranked
 
 
+**Will NOT work if you have full rune pages, This application does NOT delete exisiting rune pages, Only adds new ones.**
+
 Credits to Wazzaps for coming up with the algorithm to connect to league api.
 https://github.com/Wazzaps/LoLRuneManager
