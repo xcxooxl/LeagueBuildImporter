@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace BuildImporter
@@ -11,7 +8,9 @@ namespace BuildImporter
     {
         [JsonIgnore]
         public int accountId { get; set; }
+
         public List<ItemSet> itemSets { get; set; }
+
         [JsonIgnore]
         public long timestamp { get; set; }
     }
@@ -19,21 +18,8 @@ namespace BuildImporter
 
     public class ItemSet
     {
-        public int[] associatedChampions { get; set; }
-        public int[] associatedMaps { get; set; }
-        public Block[] blocks { get; set; }
-        public string map { get; set; }
-        public string mode { get; set; }
-        public Preferreditemslot[] preferredItemSlots { get; set; }
-        public int sortrank { get; set; }
-        public string startedFrom { get; set; }
-        public string title { get; set; }
-        public string type { get; set; }
-        public string uid { get; set; }
-
         public ItemSet()
         {
-            
         }
 
         public ItemSet(ChampionBuild build)
@@ -50,7 +36,7 @@ namespace BuildImporter
             }
             // Summoner Rift ? 
             associatedMaps = new int[0];
-            associatedChampions = new[] { build.Champion.id };
+            associatedChampions = new[] {build.Champion.id};
             map = "";
             mode = "any";
             type = "custom";
@@ -60,6 +46,18 @@ namespace BuildImporter
             title = build.Name;
             uid = Guid.NewGuid().ToString();
         }
+
+        public int[] associatedChampions { get; set; }
+        public int[] associatedMaps { get; set; }
+        public Block[] blocks { get; set; }
+        public string map { get; set; }
+        public string mode { get; set; }
+        public Preferreditemslot[] preferredItemSlots { get; set; }
+        public int sortrank { get; set; }
+        public string startedFrom { get; set; }
+        public string title { get; set; }
+        public string type { get; set; }
+        public string uid { get; set; }
     }
 
     public class Block
@@ -74,8 +72,9 @@ namespace BuildImporter
     {
         public int count { get; set; } = 1;
         public string id { get; set; }
+
         [JsonIgnore]
-        public String Name { get; set; }
+        public string Name { get; set; }
     }
 
     public class Preferreditemslot
@@ -83,5 +82,4 @@ namespace BuildImporter
         public string id { get; set; }
         public int preferredItemSlot { get; set; }
     }
-
 }

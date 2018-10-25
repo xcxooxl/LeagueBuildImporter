@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BuildImporter
+﻿namespace BuildImporter
 {
     public class Summoner
     {
@@ -30,5 +24,4 @@ namespace BuildImporter
         public int pointsCostToRoll { get; set; }
         public int pointsToReroll { get; set; }
     }
-
 }

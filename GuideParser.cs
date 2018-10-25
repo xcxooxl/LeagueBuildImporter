@@ -8,19 +8,20 @@ using HtmlAgilityPack;
 
 namespace BuildImporter
 {
-    class GuideParser
+    internal class GuideParser
     {
         public string Url { get; set; }
 
-        public GuideParser()
-        {
-        }
+        public Dictionary<string, Item> items { get; set; }
 
-        public async Task<List<ChampionBuild>> FindTopBuilds(string champName,string role = "all")
+        public Champion[] champions { get; set; }
+
+        public async Task<List<ChampionBuild>> FindTopBuilds(string champName, string role = "all")
         {
             var client = new HttpClient();
             var doc = new HtmlDocument();
-            var resultsHtml = await client.GetStringAsync($"https://www.mobafire.com/league-of-legends/browse?champion={WebUtility.UrlEncode(champName)}&role=all&category={role}&depth=guide&sort=top&order=descending&author=all&page=1");
+            var resultsHtml = await client.GetStringAsync(
+                $"https://www.mobafire.com/league-of-legends/browse?champion={WebUtility.UrlEncode(champName)}&role=all&category={role}&depth=guide&sort=top&order=descending&author=all&page=1");
             doc.LoadHtml(resultsHtml);
             var buildLinks = doc.DocumentNode.Descendants().Where(x => x.HasClass("browse-list__item")).Take(3)
                 .Select(x => x.Attributes["href"].Value);
@@ -28,16 +29,13 @@ namespace BuildImporter
             var tasks = new List<Task<List<ChampionBuild>>>();
 
             foreach (var buildLink in buildLinks)
-            {
                 tasks.Add(Task.Run(() =>
                 {
                     async Task<List<ChampionBuild>> Temp()
                     {
                         List<ChampionBuild> builds = null;
                         if (buildLink != null)
-                        {
                             builds = await GetBuilds($"https://www.mobafire.com{buildLink}");
-                        }
                         else
                             Console.WriteLine("Cant find builds for this champion.");
                         return builds;
@@ -45,7 +43,6 @@ namespace BuildImporter
 
                     return Temp();
                 }));
-            }
             await Task.WhenAll(tasks);
             return tasks.SelectMany(x => x.Result).ToList();
         }
@@ -98,15 +95,11 @@ namespace BuildImporter
                     .Where(x => x.HasClass("item-title"))?
                     .Select(x => WebUtility.HtmlDecode(x.InnerText.Replace("\t", "").Replace("\n", "")));
 
-                List<Item> foundItems = new List<Item>();
+                var foundItems = new List<Item>();
                 foreach (var itemName in itemNames)
-                {
-                    if (this.items.ContainsKey(itemName))
-                    {
+                    if (items.ContainsKey(itemName))
                         foundItems.Add(items[itemName]);
-                    }
                     else Console.WriteLine($"Failed to find item: {itemName}");
-                }
 
                 itemBuild.Items = foundItems;
                 itemBuilds.Add(itemBuild);
@@ -117,7 +110,7 @@ namespace BuildImporter
 
         private string GetBuildTitle(HtmlNode buildNode)
         {
-           var title = buildNode.Descendants().FirstOrDefault(x => x.HasClass("build-title"))
+            var title = buildNode.Descendants().FirstOrDefault(x => x.HasClass("build-title"))
                 ?.ChildNodes
                 .FirstOrDefault(x => x.Name == "h2")
                 ?.InnerText;
@@ -132,7 +125,7 @@ namespace BuildImporter
                 .Descendants().FirstOrDefault(x => x.Name == "h3")?.InnerText.Replace("\t", "").Replace("\n", "");
 
             champName = WebUtility.HtmlDecode(champName);
-            return this.champions.FirstOrDefault(x => x.name == champName);
+            return champions.FirstOrDefault(x => x.name == champName);
         }
 
 
@@ -140,9 +133,9 @@ namespace BuildImporter
         {
             var builds = new List<ChampionBuild>();
 
-            HttpClient client = new HttpClient();
+            var client = new HttpClient();
             var pageSource = await client.GetStringAsync(url);
-            HtmlDocument doc = new HtmlDocument();
+            var doc = new HtmlDocument();
             doc.LoadHtml(pageSource);
 
             var buildNodes = doc.DocumentNode.Descendants().Where(x => x.HasClass("build-gradient"));
@@ -173,13 +166,9 @@ namespace BuildImporter
             this.items = items;
         }
 
-        public Dictionary<string, Item> items { get; set; }
-
         public void SetChampions(Champion[] champions)
         {
             this.champions = champions;
         }
-
-        public Champion[] champions { get; set; }
     }
 }

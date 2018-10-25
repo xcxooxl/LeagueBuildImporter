@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Management;
-using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 
 namespace BuildImporter
 {
-    class Program
+    internal class Program
     {
         private static LolApi _lolApi;
 
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             Console.WriteLine("Connecting to league of legends..");
             _lolApi = new LolApi();
@@ -23,7 +19,6 @@ namespace BuildImporter
             Console.WriteLine("Waiting for champion lock..");
             while (true)
             {
-                
                 var champ = await _lolApi.GetCurrentChampion();
                 if (champ != null)
                 {
@@ -31,11 +26,11 @@ namespace BuildImporter
                     role = role == "utility" ? "support" : role;
                     Console.WriteLine($"Found champion: {champ.name}, Role: {role}");
 
-                    var builds = await _lolApi.GetBuildsFromChamp(champ,role);
+                    var builds = await _lolApi.GetBuildsFromChamp(champ, role);
 
                     var validatedBuilds = builds.Select(x => new {build = x, buildJson = _lolApi.PrepareRuneBuild(x)})
                         .Where(x => x.buildJson != null).ToList();
-                    var buildIndex = PickBuild(validatedBuilds.Select(x=> x.build).ToList());
+                    var buildIndex = PickBuild(validatedBuilds.Select(x => x.build).ToList());
                     var selectedBuild = validatedBuilds[buildIndex];
                     _lolApi.AddRuneBuild(selectedBuild.buildJson);
                     await _lolApi.AddItemsBuild(selectedBuild.build);
@@ -68,8 +63,9 @@ namespace BuildImporter
 
         public static int PickBuild(List<ChampionBuild> champBuilds)
         {
-            Console.WriteLine($"Found {champBuilds.Count} builds" + (champBuilds.Count > 1 ? ", Which one do you want?" : ""));
-            int buildIndex = 0;
+            Console.WriteLine($"Found {champBuilds.Count} builds" +
+                              (champBuilds.Count > 1 ? ", Which one do you want?" : ""));
+            var buildIndex = 0;
             if (champBuilds.Count > 1)
             {
                 for (var i = 0; i < champBuilds.Count; i++)
@@ -77,11 +73,9 @@ namespace BuildImporter
                     var champBuild = champBuilds[i];
                     Console.WriteLine($"{i}. {champBuild.Name}");
                 }
-                var selectedBuildIndex = Int32.TryParse(Console.ReadLine(), out buildIndex);
+                var selectedBuildIndex = int.TryParse(Console.ReadLine(), out buildIndex);
                 if (!selectedBuildIndex)
-                {
                     Console.WriteLine("You are an idiot.");
-                }
             }
 
             Console.WriteLine($"Importing build: {champBuilds[buildIndex].Name}");

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BuildImporter
+﻿namespace BuildImporter
 {
     public class Champion
     {
@@ -18,7 +12,7 @@ namespace BuildImporter
         public int id { get; set; }
         public string name { get; set; }
         public Ownership ownership { get; set; }
-        public String purchased { get; set; }
+        public string purchased { get; set; }
         public bool rankedPlayEnabled { get; set; }
         public string[] roles { get; set; }
         public string squarePortraitPath { get; set; }
@@ -35,10 +29,9 @@ namespace BuildImporter
 
     public class Rental
     {
-        public String endDate { get; set; }
-        public String purchaseDate { get; set; }
+        public string endDate { get; set; }
+        public string purchaseDate { get; set; }
         public bool rented { get; set; }
         public int winCountRemaining { get; set; }
     }
-
 }
